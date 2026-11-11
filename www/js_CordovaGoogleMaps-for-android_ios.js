@@ -885,18 +885,36 @@ CordovaGoogleMaps.prototype._remove = function(mapId) {
       }
     }
     if (div) {
-      div.__pluginMapId = undefined;
+      delete div.__pluginMapId;
     }
 
     var keys = Object.keys(self.domPositions);
-    keys.forEach(function(elemId) {
-      self.domPositions[elemId].containMapIDs = self.domPositions[elemId].containMapIDs || {};
-      delete self.domPositions[elemId].containMapIDs[mapId];
-      if ((Object.keys(self.domPositions[elemId].containMapIDs)).length < 1) {
+keys.forEach(function(elemId) {
+    var domInfo = self.domPositions[elemId];
+
+    if (!domInfo) {
+        return;
+    }
+
+    domInfo.containMapIDs = domInfo.containMapIDs || {};
+    delete domInfo.containMapIDs[mapId];
+
+    if (Object.keys(domInfo.containMapIDs).length < 1) {
+
+        // Find the corresponding DOM element
+        var ele = elemId === 'root'
+            ? document.body
+            : Array.from(document.querySelectorAll('*')).find(function(el) {
+                return el.__pluginDomId === elemId;
+            });
+
+        if (ele) {
+            common.detachTransparentClass(ele);
+        }
+
         delete self.domPositions[elemId];
-//        common.detachTransparentClass(ele);
-      }
-    });
+    }
+});
     self.MAPS[mapId].destroy();
   }
 
@@ -952,7 +970,8 @@ function postPanoramaInit(panorama, div, options) {
   Object.defineProperty(div, '__pluginMapId', {
     enumerable: false,
     value: mapId,
-    writable: true
+    writable: true,
+	configurable: true
   });
   var elemId = common.getPluginDomId(div);
 
@@ -1029,7 +1048,8 @@ function postMapInit(map, div, options) {
     Object.defineProperty(div, '__pluginMapId', {
       enumerable: false,
       value: mapId,
-      writable: true
+      writable: true,
+		configurable: true
     });
     var elemId = common.getPluginDomId(div);
 
