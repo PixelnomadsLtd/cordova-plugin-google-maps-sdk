@@ -194,12 +194,8 @@ CordovaGoogleMaps.prototype._remove = function(mapId) {
       }
     }
     if (div) {
-      Object.defineProperty(div, '__pluginMapId', {
-        enumerable: false,
-        value: undefined
-      });
+      delete div.__pluginMapId;
     }
-
     self.MAPS[mapId].destroy();
   }
   delete self.MAPS[mapId];
@@ -232,7 +228,8 @@ function postPanoramaInit(panorama, div, options) {
   // before creating the map view.
   Object.defineProperty(div, '__pluginMapId', {
     enumerable: false,
-    value: mapId
+    value: mapId,
+    configurable: true
   });
 
   if (div.offsetWidth < 100 || div.offsetHeight < 100) {
@@ -249,7 +246,8 @@ function postPanoramaInit(panorama, div, options) {
   // before creating the map view.
   Object.defineProperty(div, '__pluginMapId', {
     enumerable: false,
-    value: mapId
+    value: mapId,
+    configurable: true
   });
 
   panorama.getPanorama.apply(panorama, args);
@@ -277,7 +275,8 @@ function postMapInit(map, div, options) {
     // before creating the map view.
     Object.defineProperty(div, '__pluginMapId', {
       enumerable: false,
-      value: mapId
+      value: mapId,
+      configurable: true
     });
 
     args.push({
